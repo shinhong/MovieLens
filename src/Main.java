@@ -1,7 +1,7 @@
 package MovieRec ;
 
 import java.io.* ;
-import java.util. * ;
+import java.util.* ;
 import org.apache.commons.cli.* ;
 import org.apache.commons.configuration.* ;
 import org.apache.commons.csv.* ;
@@ -19,8 +19,9 @@ class Main
 		Options options = new Options() ;
 		options.addOption("c", "config", true, "configuration file") ;
 		options.addOption("d", "display", false, "show statistics") ;
+		options.addOption("h", "help", false, "show help message") ;
 
-		CommandLineParser parser = new BasicParser() ;
+		CommandLineParser parser = new DefaultParser() ;
 		CommandLine cmd = null ;
 		try {
 			cmd = parser.parse(options, args) ;
@@ -28,6 +29,11 @@ class Main
 				isToShow = true ;
 			if (cmd.hasOption("c"))
 				configFilePath = cmd.getOptionValue("c") ;
+			if (cmd.hasOption("h")) {
+				HelpFormatter formater = new HelpFormatter() ;
+				formater.printHelp("Usage", options) ;
+				System.exit(0) ;
+			}
 		}
 		catch (ParseException e) {
 			System.err.println(e) ;
@@ -74,12 +80,14 @@ class Main
 	{
 		int [][] error = new int[2][2] ; // actual x predict -> # 	
 
-		TreeMap<Integer, LinkedList<Integer>> 
-			users = new TreeMap<Integer, LinkedList<Integer>>();
-		TreeMap<Integer, LinkedList<Integer>> 
-			q_positive = new TreeMap<Integer, LinkedList<Integer>>();
-		TreeMap<Integer, LinkedList<Integer>> 
-			q_negative = new TreeMap<Integer, LinkedList<Integer>>();
+		TreeMap<Integer, HashSet<Integer>> 
+		users = new TreeMap<Integer, HashSet<Integer>>();
+
+		TreeMap<Integer, HashSet<Integer>> 
+		q_positive = new TreeMap<Integer, HashSet<Integer>>();
+
+		TreeMap<Integer, HashSet<Integer>> 
+		q_negative = new TreeMap<Integer, HashSet<Integer>>();
 
 		for (CSVRecord r : CSVFormat.newFormat(',').parse(ftest)) {
 			Integer user = Integer.parseInt(r.get(0)) ;
@@ -88,9 +96,9 @@ class Main
 			String type = r.get(3) ;
 
 			if (users.containsKey(user) == false) {
-				users.put(user, new LinkedList<Integer>()) ;
-				q_positive.put(user, new LinkedList<Integer>()) ;
-				q_negative.put(user, new LinkedList<Integer>()) ;
+				users.put(user, new HashSet<Integer>()) ;
+				q_positive.put(user, new HashSet<Integer>()) ;
+				q_negative.put(user, new HashSet<Integer>()) ;
 			}
 
 			if (type.equals("c")) {
@@ -106,7 +114,7 @@ class Main
 		}
 
 		for (Integer u : users.keySet()) {
-			LinkedList<Integer> u_movies = users.get(u) ;
+			HashSet<Integer> u_movies = users.get(u) ;
 			
 			for (Integer q : q_positive.get(u))
 				error[1][rec.predict(u_movies, q)] += 1 ;
@@ -117,19 +125,23 @@ class Main
 		
 		System.out.print("Precision: ") ;
 		if (error[0][1] + error[1][1] > 0)
-			System.out.println((double)(error[1][1]) / (double)(error[0][1] + error[1][1])) ;
+			System.out.println(	String.format("%.3f", 
+				(double)(error[1][1]) / (double)(error[0][1] + error[1][1]))) ;
 		else
 			System.out.println("undefined.") ;
 
 		System.out.print("Recall: ") ;
 		if (error[1][0] + error[1][1] > 0)
-			System.out.println((double)(error[1][1]) / (double)(error[1][0] + error[1][1])) ;
+			System.out.println(	String.format("%.3f", 
+				((double)(error[1][1]) / (double)(error[1][0] + error[1][1])))) ;
 		else
 			System.out.println("undefined.") ;
 
 		System.out.print("All case accuracy: ") ;
 		if (error[0][0] + error[1][1] > 0)
-			System.out.println((double)(error[1][1]) / (double)(error[0][0] + error[1][1])) ;
+			System.out.println(	String.format("%.3f", 
+				((double)(error[1][1] + error[0][0]) / 
+				(double)(error[0][0] + error[0][1] + error[1][0] + error[1][1])))) ;
 		else
 			System.out.println("undefined.") ;
 

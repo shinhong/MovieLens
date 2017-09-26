@@ -55,7 +55,7 @@ Recommender
 	}
 
 	public
-	int predict(LinkedList<Integer> profile, Integer q) {
+	int predict(HashSet<Integer> profile, Integer q) {
 		if (predictPair(profile, q) == 1)
 			return 1 ;
 		return predictTriple(profile, q) ;
@@ -111,22 +111,18 @@ Recommender
 	}
 
 	private
-	int predictPair(LinkedList<Integer> profile, Integer q) {
-		/* TODO: Implement this method */
+	int predictPair(HashSet<Integer> profile, Integer q) {
+		/* TODO: implement this method */
 		return 0 ;
 	}
 
 	private
-	int predictTriple(LinkedList<Integer> profile, Integer q) {
-		TreeSet<Integer> 
-		s = new TreeSet<Integer>(profile) ;
-
-		if (s.size() < 2)
+	int predictTriple(HashSet<Integer> profile, Integer q) {
+		if (profile.size() < 2)
 			return 0 ;
 
 		int evidence = 0 ;
-		
-		for (Set<Integer> p : Sets.combinations(s, 2)) {
+		for (Set<Integer> p : Sets.combinations(profile, 2)) {
 			Integer den = support2.get(new IntPair(p)) ;
 			if (den == null)
 				continue ;
@@ -145,7 +141,7 @@ Recommender
 				evidence++ ;
 		}
 
-		if (evidence > min_evidence_3) 
+		if (evidence >= min_evidence_3) 
 			return 1 ;
 
 		return 0 ;
@@ -202,12 +198,12 @@ IntTriple implements Comparable
 	int [] elem ;
 
 	IntTriple(Set<Integer> s) {
-		/* TODO: Implement the logic */
+		/* TODO: implement this method */
 	}
 
 	public 
 	int compareTo(Object obj) {
-		/* TODO: Implement the logic */
+		/* TODO: implement this method */
 		return 0 ;
 	}
 }

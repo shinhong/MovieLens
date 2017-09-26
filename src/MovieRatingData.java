@@ -80,12 +80,6 @@ class MovieRatingData
 	}
 
 	public 
-	HashSet<Integer>
-	getItems() {
-		return new HashSet<Integer>(Baskets.keySet()) ;
-	}
-
-	public 
 	TreeMap<Integer, HashSet<Integer>>
 	getBaskets() {
 		return Baskets ;
@@ -95,12 +89,10 @@ class MovieRatingData
 	void show() {
 		showMovieStat() ;
 		showUserStat() ;
+		showRatingStat() ;
 	}
 
-	private
-	XYDataset getNumAvgRatingDataset() {
-		return (XYDataset) new NumAvgDataset(numRatingsOfMovies, accRatingsOfMovies) ;
-	}
+
 
 	private
 	void showMovieStat() {
@@ -123,6 +115,11 @@ class MovieRatingData
 	}
 
 	private
+	XYDataset getNumAvgRatingDataset() {
+		return (XYDataset) new NumAvgDataset(numRatingsOfMovies, accRatingsOfMovies) ;
+	}
+
+	private
 	void showUserStat() {
 		ApplicationFrame frame = new ApplicationFrame("User Stat.") ;
 
@@ -137,11 +134,19 @@ class MovieRatingData
 		HistogramDataset dataset = new HistogramDataset() ;
 		dataset.setType(HistogramType.RELATIVE_FREQUENCY) ;
 		dataset.addSeries("Histogram", ratings, 20) ;
-		JFreeChart chart = ChartFactory.createHistogram("Num. Ratings Per Users",
+		JFreeChart chart = ChartFactory.createHistogram("Num. Ratings by Users",
 			"Num", "value", dataset, PlotOrientation.VERTICAL, false, false, false) ;
 		JPanel panel = new ChartPanel(chart) ;
 		frame.setContentPane(panel) ;
 		frame.pack() ;
 		frame.setVisible(true) ;
+	}
+
+	private
+	void showRatingStat() {
+		/* TODO: 
+			implement this method to draw a histogram 
+			that shows the distribution of ratings (1.0~5.0) 
+		*/
 	}
 }
