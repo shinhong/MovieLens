@@ -2,9 +2,13 @@ package MovieRec ;
 
 import java.io.* ;
 import java.util.* ;
+
 import org.apache.commons.cli.* ;
 import org.apache.commons.configuration.* ;
 import org.apache.commons.csv.* ;
+
+import org.apache.logging.log4j.Logger ; 
+import org.apache.logging.log4j.LogManager ;
 
 public 
 class Main 
@@ -12,6 +16,8 @@ class Main
 	static PropertiesConfiguration config ;
 	static boolean isToShow = false ;
 	static String configFilePath = "config.properties" ;
+	static Logger logger = LogManager.getLogger(Main.class) ;
+	static Logger informer = LogManager.getLogger("Info") ;
 
 	public static 
 	void main (String [] args) 
@@ -46,8 +52,11 @@ class Main
 			MovieRatingData data = new MovieRatingData(config) ;
 			FileReader ftrain = new FileReader(config.getString("data.training")) ;
 			FileReader ftest =  new FileReader(config.getString("data.testing")) ;
-			
+
+			logger.debug("Data loading starts.") ;		
 			data.load(ftrain) ;
+			logger.debug("Data loading finishes.") ;
+
 			if (isToShow)
 				data.show() ;
 			data.removeOutliers() ;
@@ -64,7 +73,7 @@ class Main
 	}
 	
 	public static
-	void config(String fpath) {
+	void config (String fpath) {
 		try {
 			config = new PropertiesConfiguration(fpath) ;
 		}
@@ -76,7 +85,7 @@ class Main
 
 
 	public static
-	void test(FileReader ftest, Recommender rec) throws IOException
+	void test (FileReader ftest, Recommender rec) throws IOException
 	{
 		int [][] error = new int[2][2] ; // actual x predict -> # 	
 
@@ -122,30 +131,30 @@ class Main
 			for (Integer q : q_negative.get(u))
 				error[0][rec.predict(u_movies, q)] += 1 ;
 		}
-		
-		System.out.print("Precision: ") ;
-		if (error[0][1] + error[1][1] > 0)
-			System.out.println(	String.format("%.3f", 
-				(double)(error[1][1]) / (double)(error[0][1] + error[1][1]))) ;
-		else
-			System.out.println("undefined.") ;
 
-		System.out.print("Recall: ") ;
+		if (error[0][1] + error[1][1] > 0)
+			informer.info("Precision: " +
+				String.format("%.3f", 
+					(double)(error[1][1]) / (double)(error[0][1] + error[1][1]))) ;
+		else
+			informer.info("Precision: undefined.") ;
+
 		if (error[1][0] + error[1][1] > 0)
-			System.out.println(	String.format("%.3f", 
+			informer.info("Recall: " +
+			  String.format("%.3f", 
 				((double)(error[1][1]) / (double)(error[1][0] + error[1][1])))) ;
 		else
-			System.out.println("undefined.") ;
+			informer.info("Recall: undefined.") ;
 
-		System.out.print("All case accuracy: ") ;
 		if (error[0][0] + error[1][1] > 0)
-			System.out.println(	String.format("%.3f", 
+			informer.info("All case accuracy: " +
+			  String.format("%.3f", 
 				((double)(error[1][1] + error[0][0]) / 
 				(double)(error[0][0] + error[0][1] + error[1][0] + error[1][1])))) ;
 		else
-			System.out.println("undefined.") ;
+			informer.info("All case accuracy: undefined.") ;
 
-		System.out.println("[[" + error[0][0] + ", " + error[0][1] + "],") ;
-		System.out.println(" [" + error[1][0] + ", " + error[1][1] + "]]") ;
+		informer.info("[[" + error[0][0] + ", " + error[0][1] + "], "  + 
+			"[" + error[1][0] + ", " + error[1][1] + "]]") ;
 	}
 }

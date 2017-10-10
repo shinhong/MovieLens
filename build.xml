@@ -15,6 +15,8 @@
 		<pathelement location="${lib}/jedis-2.9.0.jar"/>
 		<pathelement location="${lib}/jcommon-1.0.23.jar"/>
 		<pathelement location="${lib}/jfreechart-1.0.19.jar"/>
+		<pathelement location="${lib}/log4j-api-2.3.jar"/>
+		<pathelement location="${lib}/log4j-core-2.3.jar"/>
 	</path>
 
 	<target name="init">
@@ -31,6 +33,7 @@
 		<java classname="MovieRec.Main" fork="true" dir="." maxmemory="4096m">
 			<!-- <arg value="-d"/> -->
 			<classpath refid="lib.path"/>
+			<classpath location="."/>
 		</java>
 	</target>
 

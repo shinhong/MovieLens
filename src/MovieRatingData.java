@@ -40,8 +40,7 @@ class MovieRatingData
 	}
 
 	public 
-	void
-	load (FileReader f) throws IOException {
+	void load (FileReader f) throws IOException {
 		for (CSVRecord r : CSVFormat.newFormat(',').parse(f)) {
 			Integer user   = Integer.parseInt(r.get(0)) ;
 			Integer movie  = Integer.parseInt(r.get(1)) ;
