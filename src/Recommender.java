@@ -161,8 +161,8 @@ IntPair implements Comparable
 			this.second = second ;
 		}
 		else {
-			this.first = first ;
-			this.second = second ;
+			this.first = second ;
+			this.second = first ;
 		}
 	}
 
